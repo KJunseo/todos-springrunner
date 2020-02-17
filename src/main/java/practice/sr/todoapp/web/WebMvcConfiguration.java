@@ -1,5 +1,7 @@
 package practice.sr.todoapp.web;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
@@ -9,7 +11,17 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
  *
  * @author springrunner.kr@gmail.com
  */
+@Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
+
+    // 정적 리소스 지원
+    // 기존 resource handler 외에 resource handler를 추가하는 방법
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/assets/**")
+                .addResourceLocations("assets/","classpath:assets/")
+                .setCachePeriod(31556926);
+    }
 
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
