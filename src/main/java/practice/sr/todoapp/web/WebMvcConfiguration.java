@@ -16,12 +16,13 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     // 정적 리소스 지원
     // 기존 resource handler 외에 resource handler를 추가하는 방법
-    @Override
+    // 추가 시 기존 resource handler 작동 안하는 듯함.
+    /*@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/assets/**")
                 .addResourceLocations("assets/","classpath:assets/")
                 .setCachePeriod(31556926);
-    }
+    }*/
 
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
