@@ -1,10 +1,13 @@
 package practice.sr.todoapp.web.model;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 /**
  * 사이트(site) 정보 모델
  *
  * @author springrunner.kr@gmail.com
  */
+@ConfigurationProperties("site") // application.properties에 site로 시작하는 부분 자동 바인딩
 public class SiteProperties {
 
     private String author = "unknown";
