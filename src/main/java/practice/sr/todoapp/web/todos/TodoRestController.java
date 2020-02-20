@@ -38,6 +38,13 @@ public class TodoRestController {
         log.info("command: {}", command.getTitle());
     }
 
+    @PutMapping("/api/todos/{id}")
+    public void update(@PathVariable Long id, @RequestBody TodoWriteCommand command) {
+        todoEditor.update(id, command.getTitle(), command.isCompleted());
+
+        log.info("id: {}, command: {}", id, command);
+    }
+
     static class TodoWriteCommand {
 
         @Size(min = 4, max = 100)
