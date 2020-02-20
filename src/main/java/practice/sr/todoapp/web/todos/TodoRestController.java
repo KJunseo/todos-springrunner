@@ -45,6 +45,13 @@ public class TodoRestController {
         log.info("id: {}, command: {}", id, command);
     }
 
+    @DeleteMapping("/api/todos/{id}")
+    public void delete(@PathVariable Long id) {
+        todoEditor.delete(id);
+
+        log.info("id: {}", id);
+    }
+
     static class TodoWriteCommand {
 
         @Size(min = 4, max = 100)
