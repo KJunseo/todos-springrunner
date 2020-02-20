@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/todos")
 public class TodoRestController {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -25,12 +26,12 @@ public class TodoRestController {
         this.todoEditor = todoEditor;
     }
 
-    @GetMapping("/api/todos")
+    @GetMapping
     public List<Todo> list() {
         return todoFinder.getAll();
     }
 
-    @PostMapping("/api/todos")
+    @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public void create(@RequestBody @Valid TodoWriteCommand command) {
         todoEditor.create(command.getTitle());
@@ -38,14 +39,14 @@ public class TodoRestController {
         log.info("command: {}", command.getTitle());
     }
 
-    @PutMapping("/api/todos/{id}")
+    @PutMapping("/{id}")
     public void update(@PathVariable Long id, @RequestBody TodoWriteCommand command) {
         todoEditor.update(id, command.getTitle(), command.isCompleted());
 
         log.info("id: {}, command: {}", id, command);
     }
 
-    @DeleteMapping("/api/todos/{id}")
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         todoEditor.delete(id);
 
