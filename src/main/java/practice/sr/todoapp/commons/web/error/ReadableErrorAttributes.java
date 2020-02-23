@@ -65,6 +65,16 @@ public class ReadableErrorAttributes implements ErrorAttributes, HandlerExceptio
             }
         }
 
+        BindingResult bindingResult = ThrowableUtils.extractBindingResult(error);
+        if(Objects.nonNull(bindingResult)) {
+            List<String> errors = bindingResult
+                    .getAllErrors()
+                    .stream()
+                    .map(it -> messageSource.getMessage(it, webRequest.getLocale()))
+                    .collect(Collectors.toList());
+            attributes.put("errors", errors);
+        }
+
         return attributes;
     }
 
