@@ -54,10 +54,15 @@ public class ReadableErrorAttributes implements ErrorAttributes, HandlerExceptio
 
         // 어떤 error가 발생하더라도, 반응할 수 있도록
         if(Objects.nonNull(error)) {
-            String defaultMessage = error.getMessage();
-            String errerCode = String.format("Exception.%s", error.getClass().getSimpleName());
-            String errorMessage = messageSource.getMessage(errerCode, new Object[0], defaultMessage, webRequest.getLocale());
-            attributes.put("message", errorMessage);
+            if(ClassUtils.isAssignableValue(MessageSourceResolvable.class, error)) {
+                String errorMessage = messageSource.getMessage((MessageSourceResolvable)error, webRequest.getLocale());
+                attributes.put("message", errorMessage);
+            } else {
+                String defaultMessage = (String) attributes.get("message");
+                String errerCode = String.format("Exception.%s", error.getClass().getSimpleName());
+                String errorMessage = messageSource.getMessage(errerCode, new Object[0], defaultMessage, webRequest.getLocale());
+                attributes.put("message", errorMessage);
+            }
         }
 
         return attributes;
