@@ -41,8 +41,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public ErrorAttributes errorAttributes() {
-        return new ReadableErrorAttributes();
+    public ErrorAttributes errorAttributes(MessageSource messageSource) {
+        return new ReadableErrorAttributes(messageSource);
     }
 
     /**

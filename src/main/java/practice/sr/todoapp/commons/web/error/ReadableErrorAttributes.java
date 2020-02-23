@@ -4,15 +4,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.util.ClassUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
+import practice.sr.todoapp.commons.util.ThrowableUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 스프링부트에 기본 구현체인 {@link DefaultErrorAttributes}에 message 속성을 덮어쓰기 할 목적으로 작성한 컴포넌트이다.
@@ -28,12 +36,15 @@ public class ReadableErrorAttributes implements ErrorAttributes, HandlerExceptio
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final DefaultErrorAttributes delegate;
 
-    public ReadableErrorAttributes() {
-        this(false);
+    private MessageSource messageSource;
+
+    public ReadableErrorAttributes(MessageSource messageSource) {
+        this(false, messageSource);
     }
 
-    public ReadableErrorAttributes(boolean includeException) {
+    public ReadableErrorAttributes(boolean includeException, MessageSource messageSource) {
         this.delegate = new DefaultErrorAttributes(includeException);
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -41,8 +52,13 @@ public class ReadableErrorAttributes implements ErrorAttributes, HandlerExceptio
         Map<String, Object> attributes = delegate.getErrorAttributes(webRequest, includeStackTrace);
         Throwable error = getError(webRequest);
 
-        // TODO attributes, error 을 사용해서 message 속성을 읽기 좋은 문구로 가공한다.
-        // TODO ex) attributes.put("message", "문구");
+        // 어떤 error가 발생하더라도, 반응할 수 있도록
+        if(Objects.nonNull(error)) {
+            String defaultMessage = error.getMessage();
+            String errerCode = String.format("Exception.%s", error.getClass().getSimpleName());
+            String errorMessage = messageSource.getMessage(errerCode, new Object[0], defaultMessage, webRequest.getLocale());
+            attributes.put("message", errorMessage);
+        }
 
         return attributes;
     }
