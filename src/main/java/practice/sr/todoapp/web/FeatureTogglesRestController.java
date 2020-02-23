@@ -1,5 +1,10 @@
 package practice.sr.todoapp.web;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import practice.sr.todoapp.web.model.FeatureTogglesProperties;
+
 /**
  * `5) 확장 기능 활성화` 요구사항을 구현해보세요.
  *
@@ -16,6 +21,17 @@ package practice.sr.todoapp.web;
  *             "onlineUsersCounter": false
  *     }
  */
+@RestController
 public class FeatureTogglesRestController {
 
+    private FeatureTogglesProperties featureTogglesProperties;
+
+    public FeatureTogglesRestController(FeatureTogglesProperties featureTogglesProperties) {
+        this.featureTogglesProperties = featureTogglesProperties;
+    }
+
+    @RequestMapping("/api/feature-toggles")
+    public FeatureTogglesProperties featureTogglesProperties() {
+        return featureTogglesProperties;
+    }
 }
