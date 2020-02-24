@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -15,6 +16,7 @@ import practice.sr.todoapp.commons.web.error.ReadableErrorAttributes;
 import practice.sr.todoapp.commons.web.view.CommaSeparatedValuesView;
 import practice.sr.todoapp.security.UserSessionRepository;
 import practice.sr.todoapp.security.web.method.UserSessionHandlerMethodArgunmentResolver;
+import practice.sr.todoapp.security.web.servlet.RolesVerifyHandlerInterceptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +54,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new UserSessionHandlerMethodArgunmentResolver(sessionRepository));
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new RolesVerifyHandlerInterceptor(sessionRepository));
     }
 
     @Bean

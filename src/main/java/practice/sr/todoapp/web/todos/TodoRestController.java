@@ -8,11 +8,13 @@ import practice.sr.todoapp.core.todos.application.TodoEditor;
 import practice.sr.todoapp.core.todos.application.TodoFinder;
 import practice.sr.todoapp.core.todos.domain.Todo;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.List;
 
 @RestController
+@RolesAllowed({"ROLE_USER"})
 @RequestMapping("/api/todos")
 public class TodoRestController {
 
