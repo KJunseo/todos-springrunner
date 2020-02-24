@@ -1,5 +1,7 @@
 package practice.sr.todoapp.security;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import practice.sr.todoapp.commons.SystemException;
 
 /**
@@ -7,6 +9,7 @@ import practice.sr.todoapp.commons.SystemException;
  *
  * @author springrunner.kr@gmail.com
  */
+@ResponseStatus(HttpStatus.FORBIDDEN)
 public class AccessDeniedException extends SystemException {
 
     public AccessDeniedException() {
