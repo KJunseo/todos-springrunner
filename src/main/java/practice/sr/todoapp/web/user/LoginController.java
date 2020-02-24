@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import practice.sr.todoapp.core.user.application.UserJoinder;
@@ -50,16 +51,20 @@ public class LoginController {
         try {
             // 사용자 저장소에 사용자가 있는 경우, 비밀번호 일치 확인
             verifier.verify(command.getUsername(), command.getPassword());
-        } catch (UserPasswordNotMatchedException error) {
-            // 비밀 번호가 다르면 오류 메세지 출력 후, login 화면으로 재이동
-            model.addAttribute("message", error.getMessage());
-            return "login";
         } catch (UserEntityNotFoundException error) {
             // 기존에 존재하는 사용자가 아닐 경우 가입 시키기
             joinder.join(command.getUsername(), command.getPassword());
         }
 
         return "redirect:/todos";
+    }
+
+    // 로직 분리
+    // 비밀 번호가 다르면 오류 메세지 출력 후, login 화면으로 재이동
+    @ExceptionHandler(UserPasswordNotMatchedException.class)
+    public String handleUserPasswordNotMatchedException(UserPasswordNotMatchedException error, Model model) {
+        model.addAttribute("message", "사용자 정보가 올바르지 않습니다");
+        return "login";
     }
 
     static class LoginCommand {
