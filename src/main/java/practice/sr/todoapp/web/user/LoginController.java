@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import practice.sr.todoapp.core.user.application.UserJoinder;
@@ -34,8 +35,17 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String loginProcess(@Valid LoginCommand command, Model model) {
+    public String loginProcess(@Valid LoginCommand command, BindingResult bindingResult, Model model) {
         log.info("username: {}, password: {}", command.getUsername(), command.getPassword());
+
+        // 매개변수를 Bean에 바인딩 할 때 발생할 수 있는 에러 확인
+        // user이름을 4자 ~ 20자가 아닌 글자 수인 경우 에러 발생
+        if(bindingResult.hasErrors()) {
+            log.info("bindingResult: {}", bindingResult);
+            model.addAttribute("bindingResult", bindingResult);
+            model.addAttribute("message", "사용자 값이 올바르지 않습니다.");
+            return "login";
+        }
 
         try {
             // 사용자 저장소에 사용자가 있는 경우, 비밀번호 일치 확인
