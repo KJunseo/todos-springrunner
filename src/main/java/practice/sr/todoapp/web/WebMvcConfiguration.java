@@ -5,6 +5,7 @@ import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -12,6 +13,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import practice.sr.todoapp.commons.web.error.ReadableErrorAttributes;
 import practice.sr.todoapp.commons.web.view.CommaSeparatedValuesView;
+import practice.sr.todoapp.security.UserSessionRepository;
+import practice.sr.todoapp.security.web.method.UserSessionHandlerMethodArgunmentResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,12 @@ import java.util.List;
  */
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
+
+    UserSessionRepository sessionRepository;
+
+    public WebMvcConfiguration(UserSessionRepository sessionRepository) {
+        this.sessionRepository = sessionRepository;
+    }
 
     // 정적 리소스 지원
     // 기존 resource handler 외에 resource handler를 추가하는 방법
@@ -38,6 +47,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void configureViewResolvers(ViewResolverRegistry registry) {
         // registry.enableContentNegotiation();
         // 위와 같이 직접 설정하면, 스프링부트가 구성한 ContentNegotiatingViewResolver 전략이 무시된다.
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new UserSessionHandlerMethodArgunmentResolver(sessionRepository));
     }
 
     @Bean
