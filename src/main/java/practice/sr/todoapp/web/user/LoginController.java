@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import practice.sr.todoapp.core.user.application.UserJoinder;
 import practice.sr.todoapp.core.user.application.UserPasswordVerifier;
+import practice.sr.todoapp.core.user.domain.User;
 import practice.sr.todoapp.core.user.domain.UserEntityNotFoundException;
 import practice.sr.todoapp.core.user.domain.UserPasswordNotMatchedException;
+import practice.sr.todoapp.security.UserSession;
+import practice.sr.todoapp.security.UserSessionRepository;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
@@ -25,9 +28,12 @@ public class LoginController {
 
     private UserJoinder joinder;
 
-    public LoginController(UserPasswordVerifier verifier, UserJoinder joinder) {
+    private UserSessionRepository sessionRepository;
+
+    public LoginController(UserPasswordVerifier verifier, UserJoinder joinder, UserSessionRepository sessionRepository) {
         this.verifier = verifier;
         this.joinder = joinder;
+        this.sessionRepository = sessionRepository;
     }
 
     @GetMapping("/login")
@@ -48,13 +54,18 @@ public class LoginController {
             return "login";
         }
 
+        User user;
+
         try {
             // 사용자 저장소에 사용자가 있는 경우, 비밀번호 일치 확인
-            verifier.verify(command.getUsername(), command.getPassword());
+            user = verifier.verify(command.getUsername(), command.getPassword());
+            log.info(String.valueOf(user));
         } catch (UserEntityNotFoundException error) {
             // 기존에 존재하는 사용자가 아닐 경우 가입 시키기
-            joinder.join(command.getUsername(), command.getPassword());
+            user = joinder.join(command.getUsername(), command.getPassword());
+            log.info(String.valueOf(user));
         }
+        sessionRepository.set(new UserSession(user));
 
         return "redirect:/todos";
     }
