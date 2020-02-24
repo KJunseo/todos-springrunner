@@ -15,10 +15,7 @@ public class UserRestController {
 
     @RolesAllowed({"ROLE_USER"})
     @GetMapping("/api/user/profile")
-    public ResponseEntity<UserProfile> userProfile(UserSession userSession) {
-        if(Objects.nonNull(userSession)) {
-            return ResponseEntity.ok(new UserProfile(userSession.getUser()));
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public UserProfile userProfile(UserSession userSession) {
+        return new UserProfile(userSession.getUser());
     }
 }
