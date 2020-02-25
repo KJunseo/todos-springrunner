@@ -1,5 +1,6 @@
 package practice.sr.todoapp.web.user;
 
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,5 +46,12 @@ public class UserRestController {
         sessionRepository.set(new UserSession(savedUser));
 
         return new UserProfile(savedUser);
+    }
+
+    @GetMapping("/user/profile-picture")
+    public Resource loadProfilePicture(UserSession userSession) {
+        // 1. 사용자 프로필 이미지를 불러온다.
+        // 2. 프로필 이미지를 응답한다.
+        return storage.load(userSession.getUser().getProfilePicture().getUri());
     }
 }
