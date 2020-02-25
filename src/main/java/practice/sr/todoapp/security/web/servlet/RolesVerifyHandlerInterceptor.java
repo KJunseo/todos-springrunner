@@ -28,37 +28,26 @@ public class RolesVerifyHandlerInterceptor implements HandlerInterceptor, RolesA
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private UserSessionRepository sessionRepository;
-
-    public RolesVerifyHandlerInterceptor(UserSessionRepository sessionRepository) {
-        this.sessionRepository = sessionRepository;
-    }
-
     @Override
     public final boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(handler instanceof HandlerMethod) {
-            RolesAllowed rolesAllowed = ((HandlerMethod) handler).getMethodAnnotation(RolesAllowed.class);
+        // allowed를 얻어오는 코드를 밖으로 분리
+        RolesAllowed rolesAllowed = getRolesAllowed(handler);
 
-            if(Objects.isNull(rolesAllowed)) {
-                rolesAllowed = AnnotatedElementUtils.findMergedAnnotation(((HandlerMethod) handler).getBeanType(), RolesAllowed.class);
+        if(Objects.nonNull(rolesAllowed)) {
+
+            // 로그인 되어 있는 지 확인
+            if(Objects.isNull(request.getUserPrincipal())) {
+                throw new UnauthorizedAccessException();
             }
 
-            if(Objects.nonNull(rolesAllowed)) {
+            // 권한이 적절한지 확인
+            Set<String> matchedRoles = Stream.of(rolesAllowed.value()).filter(request::isUserInRole).collect(Collectors.toSet());
 
-                // 로그인 되어 있는 지 확인
-                UserSession userSession = sessionRepository.get();
-                if(Objects.isNull(userSession)) {
-                    throw new UnauthorizedAccessException();
-                }
-
-                // 권한이 적절한지 확인
-                Set<String> matchedRoles = Stream.of(rolesAllowed.value()).filter(role -> userSession.hasRole(role)).collect(Collectors.toSet());
-
-                if(matchedRoles.isEmpty()) {
-                    throw new AccessDeniedException();
-                }
+            if(matchedRoles.isEmpty()) {
+                throw new AccessDeniedException();
             }
         }
+
         return true;
     }
 }

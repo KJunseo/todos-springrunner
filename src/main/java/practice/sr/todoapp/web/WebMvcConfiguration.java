@@ -1,6 +1,7 @@
 package practice.sr.todoapp.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import practice.sr.todoapp.commons.web.view.CommaSeparatedValuesView;
 import practice.sr.todoapp.security.UserSessionRepository;
 import practice.sr.todoapp.security.web.method.UserSessionHandlerMethodArgunmentResolver;
 import practice.sr.todoapp.security.web.servlet.RolesVerifyHandlerInterceptor;
+import practice.sr.todoapp.security.web.servlet.UserSessionFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,12 +60,20 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new RolesVerifyHandlerInterceptor(sessionRepository));
+        registry.addInterceptor(new RolesVerifyHandlerInterceptor());
     }
 
     @Bean
     public ErrorAttributes errorAttributes(MessageSource messageSource) {
         return new ReadableErrorAttributes(messageSource);
+    }
+
+    @Bean
+    public FilterRegistrationBean<UserSessionFilter> userSessionFilter(UserSessionRepository sessionRepository) {
+        FilterRegistrationBean<UserSessionFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new UserSessionFilter(sessionRepository));
+
+        return registrationBean;
     }
 
     /**
